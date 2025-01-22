@@ -1,6 +1,8 @@
 import 'package:airplane/presentation/controllers/flight_search_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends GetView<FlightSearchController> {
   const HomeScreen({Key? key}) : super(key: key);
@@ -13,94 +15,42 @@ class HomeScreen extends GetView<FlightSearchController> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.menu),
+          icon: const Icon(Icons.menu)
+            .animate()
+            .fade(duration: 300.ms)
+            .scale(delay: 200.ms),
           onPressed: () {},
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_outlined),
+            icon: const Icon(Icons.notifications_outlined)
+              .animate()
+              .fade(duration: 300.ms)
+              .scale(delay: 200.ms),
             onPressed: () {},
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Find the best deals for your\nnext journey.',
-                style: TextStyle(
-                  fontSize: 28,
+                style: GoogleFonts.inter(
+                  fontSize: 32,
                   fontWeight: FontWeight.bold,
+                  height: 1.2,
                   color: Colors.white,
                 ),
-              ),
+              ).animate()
+                .fadeIn(duration: 600.ms)
+                .slideX(begin: -0.2, end: 0),
               const SizedBox(height: 24),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  children: [
-                    // Search Type Toggle
-                    Row(
-                      children: [
-                        Obx(() => _buildToggleButton('One-way')),
-                        Obx(() => _buildToggleButton('Round-trip')),
-                        Obx(() => _buildToggleButton('Multi-city')),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    // City Selection Fields
-                    _buildCityField(
-                      'BKK',
-                      'Bangkok, Thailand',
-                      Icons.flight_takeoff,
-                    ),
-                    const SizedBox(height: 8),
-                    _buildCityField(
-                      'LED',
-                      'St. Petersburg, Russia',
-                      Icons.flight_land,
-                    ),
-                    const SizedBox(height: 16),
-                    // Date and Passengers
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildDateField(),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: _buildPassengersField(),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    // Search Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () => controller.searchFlights(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Text('Get Started'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              _buildSearchCard(),
               const SizedBox(height: 24),
-              // Flash Sale Section
               _buildFlashSaleSection(),
             ],
           ),
@@ -109,116 +59,128 @@ class HomeScreen extends GetView<FlightSearchController> {
     );
   }
 
-  Widget _buildToggleButton(String text) {
-    final isSelected = controller.searchType.value == text.toLowerCase();
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => controller.setSearchType(text.toLowerCase()),
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: isSelected ? Colors.blue : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
+  Widget _buildSearchCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.95),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
-          child: Text(
-            text,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isSelected ? Colors.white : Colors.black,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
+        ],
       ),
+    ).animate()
+      .fadeIn(duration: 800.ms, delay: 300.ms)
+      .slideY(begin: 0.2, end: 0);
+  }
+
+  Widget _buildToggleButton(String text) {
+    return Expanded(
+      child: Obx(() {
+        final isSelected = controller.searchType.value == text.toLowerCase();
+        return GestureDetector(
+          onTap: () => controller.setSearchType(text.toLowerCase()),
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isSelected ? Colors.blue : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isSelected ? Colors.blue : Colors.grey.shade300,
+              ),
+            ),
+            child: Text(
+              text,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: isSelected ? Colors.white : Colors.black,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ).animate(target: isSelected ? 1 : 0)
+            .scale(begin: Offset(0, 1), end: Offset(0.95, 0))
+            .fadeIn(),
+        );
+      }),
     );
   }
 
   Widget _buildCityField(String code, String city, IconData icon) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade200),
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
       ),
       child: Row(
         children: [
-          Icon(icon, color: Colors.blue),
-          const SizedBox(width: 12),
+          Icon(icon, color: Colors.blue, size: 24)
+            .animate(onPlay: (controller) => controller.repeat())
+            .shimmer(duration: 2000.ms, delay: 1000.ms),
+          const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 code,
-                style: const TextStyle(
-                  fontSize: 18,
+                style: GoogleFonts.inter(
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
                 city,
-                style: TextStyle(
+                style: GoogleFonts.inter(
                   color: Colors.grey.shade600,
+                  fontSize: 14,
                 ),
               ),
             ],
           ),
         ],
       ),
-    );
+    ).animate()
+      .fadeIn(duration: 600.ms)
+      .slideX(begin: -0.2, end: 0);
   }
 
   Widget _buildDateField() {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade200),
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Date',
-            style: TextStyle(
-              color: Colors.grey,
+            style: GoogleFonts.inter(
+              color: Colors.grey.shade600,
+              fontSize: 12,
             ),
           ),
+          const SizedBox(height: 4),
           Obx(() => Text(
-                controller.selectedDate.value.toString().split(' ')[0],
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              )),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPassengersField() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Passengers',
-            style: TextStyle(
-              color: Colors.grey,
+            controller.selectedDate.value.toString().split(' ')[0],
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
             ),
-          ),
-          Obx(() => Text(
-                '${controller.passengers} Adult',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              )),
+          )),
         ],
       ),
-    );
+    ).animate()
+      .fadeIn(duration: 600.ms)
+      .slideY(begin: 0.2, end: 0);
   }
 
   Widget _buildFlashSaleSection() {
@@ -228,26 +190,127 @@ class HomeScreen extends GetView<FlightSearchController> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Flash Sale',
-              style: TextStyle(
-                fontSize: 20,
+              style: GoogleFonts.inter(
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
-            Text(
-              '02h 14m',
-              style: TextStyle(
-                color: Colors.blue.shade400,
-                fontWeight: FontWeight.bold,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
               ),
-            ),
+              child: Row(
+                children: [
+                  Icon(Icons.flash_on, color: Colors.blue.shade400, size: 16),
+                  const SizedBox(width: 4),
+                  Text(
+                    '02h 14m',
+                    style: GoogleFonts.inter(
+                      color: Colors.blue.shade400,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ).animate(onPlay: (controller) => controller.repeat())
+              .shimmer(duration: 2000.ms),
           ],
         ),
         const SizedBox(height: 16),
-        // Flash Sale Items would be implemented here
+        _buildFlashSaleCard(),
       ],
-    );
+    ).animate()
+      .fadeIn(duration: 800.ms, delay: 600.ms)
+      .slideY(begin: 0.2, end: 0);
+  }
+
+  Widget _buildFlashSaleCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.blue.shade900, Colors.blue.shade700],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Image.asset(
+                'assets/images/pegasus_logo.png',
+                height: 24,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Pegasus Airlines',
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'DXB',
+                    style: GoogleFonts.inter(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    'Dubai, UAE',
+                    style: GoogleFonts.inter(
+                      color: Colors.white.withOpacity(0.7),
+                    ),
+                  ),
+                ],
+              ),
+              Icon(
+                Icons.flight,
+                color: Colors.white.withOpacity(0.7),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    'LED',
+                    style: GoogleFonts.inter(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    'St. Petersburg',
+                    style: GoogleFonts.inter(
+                      color: Colors.white.withOpacity(0.7),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    ).animate()
+      .fadeIn(duration: 800.ms)
+      .slideX(begin: 0.2, end: 0);
   }
 }

@@ -13,7 +13,15 @@ class FlightSearchController extends GetxController {
   final selectedDate = DateTime.now().obs;
   final passengers = 1.obs;
   final flashDeals = <Flight>[].obs;
+  final isSearchExpanded = false.obs;
+  
+  void toggleSearch() {
+    isSearchExpanded.value = !isSearchExpanded.value;
+  }
 
+  // Animation durations
+  static const animationDuration = Duration(milliseconds: 300);
+  
   @override
   void onInit() {
     super.onInit();
